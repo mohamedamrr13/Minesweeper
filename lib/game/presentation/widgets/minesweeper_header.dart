@@ -113,7 +113,7 @@ class _RestartButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.accentColor,
+        color: AppColors.primaryColor,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(

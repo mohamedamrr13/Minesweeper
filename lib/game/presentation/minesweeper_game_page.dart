@@ -11,62 +11,62 @@ class MinesweeperGamePage extends StatefulWidget {
   const MinesweeperGamePage({super.key});
 
   @override
-  State<MinesweeperGamePage> createState() => _MinesweeperGamePageState();
+  State<MinesweeperGamePage> createState() => MinesweeperGamePageState();
 }
 
-class _MinesweeperGamePageState extends State<MinesweeperGamePage> {
-  late GameService _gameService;
-  late Timer _timer;
-  int _secondsElapsed = 0;
+class MinesweeperGamePageState extends State<MinesweeperGamePage> {
+  late GameService gameService;
+  late Timer timer;
+  int secondsElapsed = 0;
 
   @override
   void initState() {
     super.initState();
-    _gameService = GameService();
-    _initializeGame();
+    gameService = GameService();
+    initializeGame();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    timer.cancel();
     super.dispose();
   }
 
-  void _initializeGame() {
-    _gameService.initializeGame();
-    _secondsElapsed = 0;
-    _timer = Timer.periodic(const Duration(seconds: 1), _updateTimer);
+  void initializeGame() {
+    gameService.initializeGame();
+    secondsElapsed = 0;
+    timer = Timer.periodic(const Duration(seconds: 1), updateTimer);
   }
 
-  void _updateTimer(Timer timer) {
-    if (_gameService.status == GameStatus.playing) {
+  void updateTimer(Timer timer) {
+    if (gameService.status == GameStatus.playing) {
       setState(() {
-        _secondsElapsed++;
+        secondsElapsed++;
       });
     }
   }
 
-  void _onCellTap(int index) {
+  void onCellTap(int index) {
     setState(() {
-      _gameService.tapCell(index);
+      gameService.tapCell(index);
     });
   }
 
-  void _onCellLongPress(int index) {
+  void onCellLongPress(int index) {
     setState(() {
-      _gameService.toggleFlag(index);
+      gameService.toggleFlag(index);
     });
   }
 
-  void _restartGame() {
-    _timer.cancel();
+  void restartGame() {
+    timer.cancel();
     setState(() {
-      _initializeGame();
+      initializeGame();
     });
   }
 
-  String _getGameStatusEmoji() {
-    switch (_gameService.status) {
+  String getGameStatusEmoji() {
+    switch (gameService.status) {
       case GameStatus.won:
         return '😎';
       case GameStatus.lost:
@@ -89,23 +89,25 @@ class _MinesweeperGamePageState extends State<MinesweeperGamePage> {
             letterSpacing: 2.0,
           ),
         ),
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: AppColors.surfaceColor,
         centerTitle: true,
-        elevation: 4,
       ),
       body: Column(
         children: [
+          Spacer(),
           GameHeader(
-            secondsElapsed: _secondsElapsed,
-            remainingMines: _gameService.remainingMines,
-            gameStatusEmoji: _getGameStatusEmoji(),
-            onRestart: _restartGame,
+            secondsElapsed: secondsElapsed,
+            remainingMines: gameService.remainingMines,
+            gameStatusEmoji: getGameStatusEmoji(),
+            onRestart: restartGame,
           ),
           GameGrid(
-            grid: _gameService.grid,
-            onCellTap: _onCellTap,
-            onCellLongPress: _onCellLongPress,
+            grid: gameService.grid,
+            onCellTap: onCellTap,
+            onCellLongPress: onCellLongPress,
           ),
+
+          Spacer(),
           const InstructionsPanel(),
         ],
       ),

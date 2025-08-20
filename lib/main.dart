@@ -5,10 +5,10 @@ import 'package:window_size/window_size.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  setWindowMinSize(const Size(600, 1000));
+  setWindowMinSize(const Size(600, 2000));
   runApp(
     DevicePreview(
-      enabled: true,
+      enabled: false,
       builder: (BuildContext context) {
         return const MineSweeper();
       },

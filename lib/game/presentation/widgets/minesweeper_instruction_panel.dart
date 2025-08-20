@@ -17,8 +17,8 @@ class InstructionsPanel extends StatelessWidget {
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _InstructionItem(icon: Icons.touch_app, text: 'Tap to reveal'),
-          _InstructionItem(
+          InstructionItem(icon: Icons.touch_app, text: 'Tap to reveal'),
+          InstructionItem(
             icon: Icons.flag,
             text: 'Hold to flag',
             iconColor: AppColors.accentColor,
@@ -29,12 +29,12 @@ class InstructionsPanel extends StatelessWidget {
   }
 }
 
-class _InstructionItem extends StatelessWidget {
+class InstructionItem extends StatelessWidget {
   final IconData icon;
   final String text;
   final Color iconColor;
 
-  const _InstructionItem({
+  const InstructionItem({super.key, 
     required this.icon,
     required this.text,
     this.iconColor = AppColors.textSecondary,

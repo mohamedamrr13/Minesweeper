@@ -1,6 +1,6 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
-import 'package:test/game/presentation/minesweeper_game_page.dart';
+import 'package:test/minesweeper/presentation/minesweeper_game_page.dart';
 import 'package:window_size/window_size.dart';
 
 void main() {

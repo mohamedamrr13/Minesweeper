@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:test/game/data/models/minesweeper_cell.dart';
-import 'package:test/game/data/models/minesweeper_config.dart';
-import 'package:test/game/presentation/widgets/minesweeper_cell.dart';
+import 'package:test/minesweeper/data/models/minesweeper_cell.dart';
+import 'package:test/minesweeper/data/models/minesweeper_config.dart';
+import 'package:test/minesweeper/presentation/widgets/minesweeper_cell.dart';
 import 'package:test/utils/colors.dart';
 
 class GameGrid extends StatelessWidget {
   final List<Cell> grid;
   final Function(int) onCellTap;
   final Function(int) onCellLongPress;
+  final Difficulty difficulty;
 
   const GameGrid({
     super.key,
     required this.grid,
     required this.onCellTap,
     required this.onCellLongPress,
+    required this.difficulty,
   });
 
   @override
   Widget build(BuildContext context) {
+    final gridSize = GameConfig.getGridSize(difficulty);
+    final totalCells = GameConfig.getTotalCells(difficulty);
+    
     return Container(
       width: MediaQuery.of(context).size.height / 2.3,
       margin: const EdgeInsets.all(16),
@@ -48,9 +53,9 @@ class GameGrid extends StatelessWidget {
               child: GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: GameConfig.totalCells,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: GameConfig.gridSize,
+                itemCount: totalCells,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: gridSize,
                   mainAxisSpacing: GameConfig.cellSpacing,
                   crossAxisSpacing: GameConfig.cellSpacing,
                 ),

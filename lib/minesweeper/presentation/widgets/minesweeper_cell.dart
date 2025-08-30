@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test/game/data/models/minesweeper_cell.dart';
+import 'package:test/minesweeper/data/models/minesweeper_cell.dart';
 import 'package:test/utils/colors.dart';
 
 

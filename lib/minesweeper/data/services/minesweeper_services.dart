@@ -8,17 +8,25 @@ class GameService {
   GameStatus _status = GameStatus.playing;
   int _flagsPlaced = 0;
   bool _firstTap = true;
+  Difficulty _difficulty = Difficulty.medium;
 
   // Getters
   List<Cell> get grid => _grid;
   GameStatus get status => _status;
   int get flagsPlaced => _flagsPlaced;
-  int get remainingMines => GameConfig.bombCount - _flagsPlaced;
+  int get remainingMines => GameConfig.getBombCount(_difficulty) - _flagsPlaced;
   bool get isFirstTap => _firstTap;
+  Difficulty get difficulty => _difficulty;
+
+  // Set difficulty
+  void setDifficulty(Difficulty difficulty) {
+    _difficulty = difficulty;
+  }
 
   // Initialize new game
   void initializeGame() {
-    _grid = List.generate(GameConfig.totalCells, (index) => Cell());
+    final totalCells = GameConfig.getTotalCells(_difficulty);
+    _grid = List.generate(totalCells, (index) => Cell());
     _status = GameStatus.playing;
     _flagsPlaced = 0;
     _firstTap = true;
@@ -28,9 +36,11 @@ class GameService {
   void generateBombs(int safeCellIndex) {
     final random = Random();
     final bombPositions = <int>{};
+    final bombCount = GameConfig.getBombCount(_difficulty);
+    final totalCells = GameConfig.getTotalCells(_difficulty);
 
-    while (bombPositions.length < GameConfig.bombCount) {
-      final position = random.nextInt(GameConfig.totalCells);
+    while (bombPositions.length < bombCount) {
+      final position = random.nextInt(totalCells);
       if (position != safeCellIndex && !bombPositions.contains(position)) {
         bombPositions.add(position);
         _grid[position].isBomb = true;
@@ -38,7 +48,7 @@ class GameService {
     }
 
     // Calculate adjacent bomb counts
-    for (int i = 0; i < GameConfig.totalCells; i++) {
+    for (int i = 0; i < totalCells; i++) {
       if (!_grid[i].isBomb) {
         _grid[i].adjacentBombs = getAdjacentBombCount(i);
       }
@@ -64,8 +74,9 @@ class GameService {
   // Get neighbor indices for a given cell
   List<int> getNeighbors(int index) {
     final neighbors = <int>[];
-    final row = index ~/ GameConfig.gridSize;
-    final col = index % GameConfig.gridSize;
+    final gridSize = GameConfig.getGridSize(_difficulty);
+    final row = index ~/ gridSize;
+    final col = index % gridSize;
 
     for (int deltaRow = -1; deltaRow <= 1; deltaRow++) {
       for (int deltaCol = -1; deltaCol <= 1; deltaCol++) {
@@ -75,10 +86,10 @@ class GameService {
         final newCol = col + deltaCol;
 
         if (newRow >= 0 &&
-            newRow < GameConfig.gridSize &&
+            newRow < gridSize &&
             newCol >= 0 &&
-            newCol < GameConfig.gridSize) {
-          neighbors.add(newRow * GameConfig.gridSize + newCol);
+            newCol < gridSize) {
+          neighbors.add(newRow * gridSize + newCol);
         }
       }
     }
@@ -114,10 +125,11 @@ class GameService {
       return false;
     }
 
+    final bombCount = GameConfig.getBombCount(_difficulty);
     if (_grid[index].isFlagged) {
       _grid[index].unflag();
       _flagsPlaced--;
-    } else if (_flagsPlaced < GameConfig.bombCount) {
+    } else if (_flagsPlaced < bombCount) {
       _grid[index].flag();
       _flagsPlaced++;
     } else {

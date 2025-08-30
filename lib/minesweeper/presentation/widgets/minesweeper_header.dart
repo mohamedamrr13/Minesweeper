@@ -42,7 +42,7 @@ class GameHeader extends StatelessWidget {
           _RestartButton(emoji: gameStatusEmoji, onPressed: onRestart),
           _DisplayContainer(
             title: "MINES",
-            value: remainingMines.toString().padLeft(2, '0'),
+            value: remainingMines.toString().padLeft(3, '0'),
           ),
         ],
       ),
@@ -59,7 +59,7 @@ class _DisplayContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       decoration: BoxDecoration(
         color: AppColors.surfaceColor,
         border: Border(

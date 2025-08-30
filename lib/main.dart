@@ -1,11 +1,15 @@
+import 'dart:io' show Platform;
 import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:test/minesweeper/presentation/minesweeper_game_page.dart';
 import 'package:window_size/window_size.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  setWindowMinSize(const Size(600, 2000));
+  if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+    setWindowMinSize(const Size(600, 2000));
+  }
   runApp(
     DevicePreview(
       enabled: false,

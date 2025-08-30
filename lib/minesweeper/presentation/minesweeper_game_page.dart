@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:test/minesweeper/data/models/minesweeper_config.dart';
 import 'package:test/minesweeper/data/models/minesweeper_status.dart';
 import 'package:test/minesweeper/data/services/minesweeper_services.dart';
@@ -50,6 +51,12 @@ class MinesweeperGamePageState extends State<MinesweeperGamePage> {
   void onCellTap(int index) {
     setState(() {
       gameService.tapCell(index);
+      if (gameService.status == GameStatus.lost) {
+        SystemSound.play(SystemSoundType.alert);
+      } else if (!gameService.toggleFlag(index) &&
+          !gameService.grid[index].isBomb) {
+        SystemSound.play(SystemSoundType.click);
+      }
       if (gameService.status == GameStatus.won) {
         _showWinDialog();
       }
@@ -107,6 +114,8 @@ class MinesweeperGamePageState extends State<MinesweeperGamePage> {
   void onCellLongPress(int index) {
     setState(() {
       gameService.toggleFlag(index);
+      HapticFeedback.vibrate();
+      SystemSound.play(SystemSoundType.alert);
     });
   }
 

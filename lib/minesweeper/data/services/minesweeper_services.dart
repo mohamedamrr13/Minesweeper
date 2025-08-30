@@ -156,7 +156,6 @@ class GameService {
     }
   }
 
-  // Reveal all bombs (game over)
   void _revealAllBombs() {
     for (final cell in _grid) {
       if (cell.isBomb) {

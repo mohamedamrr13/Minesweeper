@@ -8,12 +8,12 @@ class GameHeader extends StatelessWidget {
   final VoidCallback onRestart;
 
   const GameHeader({
-    Key? key,
+    super.key,
     required this.secondsElapsed,
     required this.remainingMines,
     required this.gameStatusEmoji,
     required this.onRestart,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +59,7 @@ class _DisplayContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
       decoration: BoxDecoration(
         color: AppColors.surfaceColor,
         border: Border(
@@ -82,7 +82,7 @@ class _DisplayContainer extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             decoration: BoxDecoration(
               color: Colors.black,
               borderRadius: BorderRadius.circular(4),

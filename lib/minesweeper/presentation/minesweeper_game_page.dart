@@ -10,7 +10,9 @@ import 'package:test/minesweeper/presentation/widgets/minesweeper_instruction_pa
 import 'package:test/utils/colors.dart';
 
 class MinesweeperGamePage extends StatefulWidget {
-  const MinesweeperGamePage({super.key});
+  final Difficulty? initialDifficulty;
+
+  const MinesweeperGamePage({super.key, this.initialDifficulty});
 
   @override
   State<MinesweeperGamePage> createState() => MinesweeperGamePageState();
@@ -25,6 +27,9 @@ class MinesweeperGamePageState extends State<MinesweeperGamePage> {
   void initState() {
     super.initState();
     gameService = GameService();
+    if (widget.initialDifficulty != null) {
+      gameService.setDifficulty(widget.initialDifficulty!);
+    }
     initializeGame();
   }
 
@@ -56,6 +61,8 @@ class MinesweeperGamePageState extends State<MinesweeperGamePage> {
       } else if (!gameService.toggleFlag(index) &&
           !gameService.grid[index].isBomb) {
         SystemSound.play(SystemSoundType.click);
+      } else {
+        SystemSound.play(SystemSoundType.alert);
       }
       if (gameService.status == GameStatus.won) {
         _showWinDialog();
@@ -144,15 +151,23 @@ class MinesweeperGamePageState extends State<MinesweeperGamePage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDifficultyButton('Easy', Difficulty.easy, '6x6, 6 mines'),
+              _buildDifficultyButton(
+                'Easy',
+                Difficulty.easy,
+                '6x6 grid, 6 mines',
+              ),
               const SizedBox(height: 12),
               _buildDifficultyButton(
                 'Medium',
                 Difficulty.medium,
-                '7x7, 9 mines',
+                '7x7 grid, 9 mines',
               ),
               const SizedBox(height: 12),
-              _buildDifficultyButton('Hard', Difficulty.hard, '8x8, 15 mines'),
+              _buildDifficultyButton(
+                'Hard',
+                Difficulty.hard,
+                '8x8 grid, 15 mines',
+              ),
             ],
           ),
         );
@@ -237,6 +252,10 @@ class MinesweeperGamePageState extends State<MinesweeperGamePage> {
         ),
         backgroundColor: AppColors.surfaceColor,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: AppColors.textPrimary),
@@ -247,8 +266,24 @@ class MinesweeperGamePageState extends State<MinesweeperGamePage> {
       body: Column(
         children: [
           const Spacer(),
-
           // Difficulty indicator
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'Difficulty: ${getDifficultyText()}',
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
           GameHeader(
             secondsElapsed: secondsElapsed,
             remainingMines: gameService.remainingMines,

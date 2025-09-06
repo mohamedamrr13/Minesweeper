@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:test/minesweeper/data/models/minesweeper_config.dart';
+import 'package:test/minesweeper/data/services/score_service.dart';
+
 import 'package:test/minesweeper/presentation/minesweeper_game_page.dart';
+import 'package:test/minesweeper/presentation/score_page.dart';
 import 'package:test/utils/colors.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final HighscoreService? highscoreService;
+
+  const HomePage({super.key, this.highscoreService});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,7 +22,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   late Animation<double> _backgroundRotation;
   late Animation<double> _pulseAnimation;
-  late Animation<double> _floatingAnimation;
 
   @override
   void initState() {
@@ -48,9 +52,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       duration: const Duration(seconds: 3),
       vsync: this,
     );
-    _floatingAnimation = Tween<double>(begin: -10, end: 10).animate(
-      CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
-    );
     _floatingController.repeat(reverse: true);
   }
 
@@ -78,6 +79,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         backgroundColor: AppColors.surfaceColor,
         centerTitle: true,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        actions: [
+          if (widget.highscoreService != null)
+            IconButton(
+              icon:
+                  const Icon(Icons.emoji_events, color: AppColors.textPrimary),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HighscorePage(
+                    highscoreService: widget.highscoreService!,
+                  ),
+                ),
+              ),
+              tooltip: 'View Highscores',
+            ),
+        ],
       ),
       body: Stack(
         children: [
@@ -90,62 +108,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
-                  // Animated welcome section
-                  AnimatedBuilder(
-                    animation: _floatingAnimation,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: Offset(0, _floatingAnimation.value),
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceColor.withOpacity(0.95),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: AppColors.borderDark.withOpacity(0.3),
-                                  width: 1,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  const Text(
-                                    'Welcome to Minesweeper!',
-                                    style: TextStyle(
-                                      color: AppColors.textPrimary,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'Test your logic and luck in this classic puzzle game',
-                                    style: TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 14,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 40),
-
                   // Difficulty selection section
                   Container(
                     padding: const EdgeInsets.all(24),
@@ -214,83 +176,239 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
 
-                  // Enhanced leaderboard section
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceColor.withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: AppColors.borderDark.withOpacity(0.3),
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.amber.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.emoji_events,
-                                color: Colors.amber,
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Leaderboard',
-                              style: TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          '🚧 Coming Soon! 🚧',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Track your best times and compete with players worldwide',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 12,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Enhanced leaderboard section with dynamic content
+                  _buildLeaderboardSection(),
 
                   // Add bottom padding for better scrolling
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
+                  const Center(
+                      child: Text(
+                    "MADE BY MOHAMEDAMR",
+                    style: TextStyle(fontSize: 24, color: AppColors.white),
+                  ))
                 ],
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeaderboardSection() {
+    if (widget.highscoreService == null) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceColor.withOpacity(0.95),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.borderDark.withOpacity(0.3),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.emoji_events,
+                    color: Colors.amber,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Leaderboard',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              '🚧 Storage Unavailable 🚧',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Scores cannot be saved in this session',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    final hasScores = widget.highscoreService!.hasHighscores();
+    final bestTimes = widget.highscoreService!.getAllBestTimes();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceColor.withOpacity(0.95),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.borderDark.withOpacity(0.3),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.emoji_events,
+                  color: Colors.amber,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Your Best Times',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (!hasScores) ...[
+            const Text(
+              '🏁 No records yet! 🏁',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Play some games to set your personal bests',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ] else ...[
+            ...Difficulty.values.map((difficulty) {
+              final bestTime = bestTimes[difficulty];
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          _getDifficultyIcon(difficulty),
+                          color: _getDifficultyColor(difficulty),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _getDifficultyName(difficulty),
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      bestTime?.formattedTime ?? '--:--',
+                      style: TextStyle(
+                        color: bestTime != null
+                            ? Colors.amber
+                            : AppColors.textSecondary,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HighscorePage(
+                      highscoreService: widget.highscoreService!,
+                    ),
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.amber,
+                  side: const BorderSide(color: Colors.amber),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.emoji_events, size: 18),
+                    SizedBox(width: 8),
+                    Text(
+                      'View All Scores',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -400,49 +518,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  // Widget _buildFloatingMine(int index) {
-  //   final random = (index * 47) % 100; // Pseudo-random positioning
-  //   final left = (random * 3.6) % 100; // 0-100%
-  //   final top = ((random * 7.3) % 100); // 0-100%
-
-  //   return AnimatedBuilder(
-  //     animation: _pulseController,
-  //     builder: (context, child) {
-  //       return Positioned(
-  //         left: MediaQuery.of(context).size.width * (left / 100),
-  //         top: MediaQuery.of(context).size.height * (top / 100),
-  //         child: Transform.scale(
-  //           scale: 0.5 + (_pulseAnimation.value * 0.3),
-  //           child: Container(
-  //             width: 20,
-  //             height: 20,
-  //             decoration: BoxDecoration(
-  //               color: Colors.red.withOpacity(0.6 * _pulseAnimation.value),
-  //               shape: BoxShape.circle,
-  //               boxShadow: [
-  //                 BoxShadow(
-  //                   color: Colors.red.withOpacity(0.3 * _pulseAnimation.value),
-  //                   blurRadius: 10,
-  //                   spreadRadius: 2,
-  //                 ),
-  //               ],
-  //             ),
-  //             child: Center(
-  //               child: Text(
-  //                 '💣',
-  //                 style: TextStyle(
-  //                   fontSize: 12,
-  //                   color: Colors.white.withOpacity(_pulseAnimation.value),
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   Widget _buildEnhancedDifficultyCard(
     BuildContext context,
     String title,
@@ -452,7 +527,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     Color iconColor,
     Difficulty difficulty,
   ) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Material(
         color: Colors.transparent,
@@ -524,23 +599,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: iconColor,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        description,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -565,22 +623,57 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            MinesweeperGamePage(initialDifficulty: difficulty),
+            MinesweeperGamePage(
+          initialDifficulty: difficulty,
+          highscoreService: widget.highscoreService,
+        ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
-            position:
-                Tween<Offset>(
-                  begin: const Offset(1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-                ),
+            position: Tween<Offset>(
+              begin: const Offset(1.0, 0.0),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+            ),
             child: child,
           );
         },
         transitionDuration: const Duration(milliseconds: 300),
       ),
     );
+  }
+
+  String _getDifficultyName(Difficulty difficulty) {
+    switch (difficulty) {
+      case Difficulty.easy:
+        return 'Easy';
+      case Difficulty.medium:
+        return 'Medium';
+      case Difficulty.hard:
+        return 'Hard';
+    }
+  }
+
+  Color _getDifficultyColor(Difficulty difficulty) {
+    switch (difficulty) {
+      case Difficulty.easy:
+        return const Color(0xFF4CAF50);
+      case Difficulty.medium:
+        return const Color(0xFFFF9800);
+      case Difficulty.hard:
+        return const Color(0xFFE53E3E);
+    }
+  }
+
+  IconData _getDifficultyIcon(Difficulty difficulty) {
+    switch (difficulty) {
+      case Difficulty.easy:
+        return Icons.sentiment_satisfied;
+      case Difficulty.medium:
+        return Icons.sentiment_neutral;
+      case Difficulty.hard:
+        return Icons.sentiment_very_dissatisfied;
+    }
   }
 }
 
@@ -604,7 +697,7 @@ class GeometricBackgroundPainter extends CustomPainter {
         // Vary opacity and color based on position
         final distance =
             ((x - size.width / 2).abs() + (y - size.height / 2).abs()) /
-            (size.width + size.height);
+                (size.width + size.height);
         final opacity = (0.3 - distance * 0.2).clamp(0.0, 0.3);
 
         if (opacity > 0) {
@@ -629,20 +722,9 @@ class GeometricBackgroundPainter extends CustomPainter {
     final path = Path();
     for (int i = 0; i < 6; i++) {
       final angle = (i * 60.0) * (3.14159 / 180.0);
-      final x =
-          center.dx +
-          radius *
-              (angle == 0
-                  ? 1
-                  : (angle == 3.14159 ? -1 : (angle < 3.14159 ? 0.5 : -0.5)));
+      final x = center.dx + radius * [1.0, 0.5, -0.5, -1.0, -0.5, 0.5][i];
       final y =
-          center.dy +
-          radius *
-              (angle == 3.14159 / 2
-                  ? 1
-                  : (angle == 3 * 3.14159 / 2
-                        ? -1
-                        : (angle < 3.14159 ? 0.866 : -0.866)));
+          center.dy + radius * [0.0, 0.866, 0.866, 0.0, -0.866, -0.866][i];
 
       if (i == 0) {
         path.moveTo(x, y);

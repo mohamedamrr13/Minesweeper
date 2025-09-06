@@ -32,25 +32,41 @@ class GameService {
     _firstTap = true;
   }
 
-  // Generate bombs after first tap to ensure first cell is safe
+  // Generate bombs after first tap to ensure first cell is safe & empty
   void generateBombs(int safeCellIndex) {
     final random = Random();
-    final bombPositions = <int>{};
     final bombCount = GameConfig.getBombCount(_difficulty);
     final totalCells = GameConfig.getTotalCells(_difficulty);
 
-    while (bombPositions.length < bombCount) {
-      final position = random.nextInt(totalCells);
-      if (position != safeCellIndex && !bombPositions.contains(position)) {
-        bombPositions.add(position);
-        _grid[position].isBomb = true;
-      }
-    }
+    bool validSetup = false;
 
-    // Calculate adjacent bomb counts
-    for (int i = 0; i < totalCells; i++) {
-      if (!_grid[i].isBomb) {
-        _grid[i].adjacentBombs = getAdjacentBombCount(i);
+    while (!validSetup) {
+      // Clear any existing bombs
+      for (var cell in _grid) {
+        cell.isBomb = false;
+        cell.adjacentBombs = 0;
+      }
+
+      // Place bombs randomly (avoiding safeCellIndex)
+      final bombPositions = <int>{};
+      while (bombPositions.length < bombCount) {
+        final position = random.nextInt(totalCells);
+        if (position != safeCellIndex) {
+          bombPositions.add(position);
+          _grid[position].isBomb = true;
+        }
+      }
+
+      // Calculate adjacent bomb counts
+      for (int i = 0; i < totalCells; i++) {
+        if (!_grid[i].isBomb) {
+          _grid[i].adjacentBombs = getAdjacentBombCount(i);
+        }
+      }
+
+      // ✅ Check: is the safe cell a "0"? If yes, we’re good
+      if (_grid[safeCellIndex].adjacentBombs == 0) {
+        validSetup = true;
       }
     }
 
@@ -71,7 +87,6 @@ class GameService {
     return count;
   }
 
-  // Get neighbor indices for a given cell
   List<int> getNeighbors(int index) {
     final neighbors = <int>[];
     final gridSize = GameConfig.getGridSize(_difficulty);

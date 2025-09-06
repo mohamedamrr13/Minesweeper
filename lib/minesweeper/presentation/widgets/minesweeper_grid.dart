@@ -8,6 +8,7 @@ class GameGrid extends StatelessWidget {
   final List<Cell> grid;
   final Function(int) onCellTap;
   final Function(int) onCellLongPress;
+  final Function(int) onCellRightClick;
   final Difficulty difficulty;
 
   const GameGrid({
@@ -15,6 +16,7 @@ class GameGrid extends StatelessWidget {
     required this.grid,
     required this.onCellTap,
     required this.onCellLongPress,
+    required this.onCellRightClick,
     required this.difficulty,
   });
 
@@ -22,7 +24,7 @@ class GameGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final gridSize = GameConfig.getGridSize(difficulty);
     final totalCells = GameConfig.getTotalCells(difficulty);
-    
+
     return Container(
       width: MediaQuery.of(context).size.height / 2.3,
       margin: const EdgeInsets.all(16),
@@ -31,17 +33,29 @@ class GameGrid extends StatelessWidget {
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.borderDark, width: 3),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.cardColor,
+            AppColors.cardColor.withOpacity(0.9),
+          ],
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
+          BoxShadow(
+            color: Colors.red.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
         ],
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Calculate the maximum square size that fits in the available space
           double maxSize = constraints.maxHeight < constraints.maxWidth
               ? constraints.maxHeight
               : constraints.maxWidth;
@@ -63,6 +77,7 @@ class GameGrid extends StatelessWidget {
                   cell: grid[index],
                   onTap: () => onCellTap(index),
                   onLongPress: () => onCellLongPress(index),
+                  onRightClick: () => onCellRightClick(index),
                 ),
               ),
             ),
